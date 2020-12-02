@@ -9,15 +9,14 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be50fef8-56e6-460c-a4ba-fb105f36eb83" name="Default Changelist" comment="Chapter 4">
-      <change afterPath="$PROJECT_DIR$/AstGenerator/AstGenerator.csproj" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/AstGenerator/GenerateAst.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lox/Syntax/Expression.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" afterDir="false" />
+    <list default="true" id="be50fef8-56e6-460c-a4ba-fb105f36eb83" name="Default Changelist" comment="Add another IDEA file">
+      <change afterPath="$PROJECT_DIR$/Lox/Parser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/contentModel.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lox.sln" beforeDir="false" afterPath="$PROJECT_DIR$/Lox.sln" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lox/Token.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Token.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lox/TokenType.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/TokenType.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lox/ConsoleErrorReporter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/ConsoleErrorReporter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lox/IErrorReporter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/IErrorReporter.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lox/Lox.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Lox.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -34,9 +33,6 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/Lox/Program.cs" />
-        <option value="$PROJECT_DIR$/Lox/IErrorReporter.cs" />
-        <option value="$PROJECT_DIR$/Lox/ConsoleErrorReporter.cs" />
-        <option value="$PROJECT_DIR$/Lox/Lox.cs" />
         <option value="$PROJECT_DIR$/Lox/Scanner.cs" />
         <option value="$PROJECT_DIR$/Lox/Tools/AstGenerator.cs" />
         <option value="$PROJECT_DIR$/Tools/Program.cs" />
@@ -45,7 +41,11 @@
         <option value="$PROJECT_DIR$/AstGenerator/GenerateAst.cs" />
         <option value="$PROJECT_DIR$/Lox/Token.cs" />
         <option value="$PROJECT_DIR$/Lox/TokenType.cs" />
+        <option value="$PROJECT_DIR$/Lox/IErrorReporter.cs" />
+        <option value="$PROJECT_DIR$/Lox/ConsoleErrorReporter.cs" />
+        <option value="$PROJECT_DIR$/Lox/Parser.cs" />
         <option value="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" />
+        <option value="$PROJECT_DIR$/Lox/Lox.cs" />
       </list>
     </option>
   </component>
@@ -73,7 +73,7 @@
     <property name="nodejs_package_manager_path" value="npm" />
     <property name="vue.rearranger.settings.migration" value="true" />
   </component>
-  <component name="RunManager" selected=".NET Project.Tools">
+  <component name="RunManager" selected=".NET Project.Lox">
     <configuration name="Lox" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -123,7 +123,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1606928922747</updated>
-      <workItem from="1606928930046" duration="9142000" />
+      <workItem from="1606928930046" duration="11169000" />
     </task>
     <task id="LOCAL-00001" summary="Chapter 4">
       <created>1606946039099</created>
@@ -132,7 +132,21 @@
       <option name="project" value="LOCAL" />
       <updated>1606946039099</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Representing code">
+      <created>1606949452507</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1606949452507</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Add another IDEA file">
+      <created>1606949466840</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1606949466840</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -155,29 +169,31 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
     <MESSAGE value="Chapter 4" />
-    <option name="LAST_COMMIT_MESSAGE" value="Chapter 4" />
+    <MESSAGE value="Representing code" />
+    <MESSAGE value="Add another IDEA file" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add another IDEA file" />
   </component>
   <component name="WindowStateProjectService">
     <state x="739" y="353" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606946955908">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="739" y="353" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606946955908" />
-    <state width="2514" height="379" key="GridCell.Tab.0.bottom" timestamp="1606949172421">
+    <state width="2514" height="379" key="GridCell.Tab.0.bottom" timestamp="1606950856002">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.bottom/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606949172421" />
-    <state width="2514" height="379" key="GridCell.Tab.0.center" timestamp="1606949172421">
+    <state width="2514" height="379" key="GridCell.Tab.0.bottom/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950856002" />
+    <state width="2514" height="379" key="GridCell.Tab.0.center" timestamp="1606950856002">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.center/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606949172421" />
-    <state width="2514" height="379" key="GridCell.Tab.0.left" timestamp="1606949172421">
+    <state width="2514" height="379" key="GridCell.Tab.0.center/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950856002" />
+    <state width="2514" height="379" key="GridCell.Tab.0.left" timestamp="1606950856002">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.left/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606949172421" />
-    <state width="2514" height="379" key="GridCell.Tab.0.right" timestamp="1606949172421">
+    <state width="2514" height="379" key="GridCell.Tab.0.left/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950856002" />
+    <state width="2514" height="379" key="GridCell.Tab.0.right" timestamp="1606950856002">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.right/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606949172421" />
+    <state width="2514" height="379" key="GridCell.Tab.0.right/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950856002" />
     <state x="876" y="430" key="Rider.ProjectTemplateDialog.Size" timestamp="1606946298956">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
@@ -186,6 +202,10 @@
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="1057" y="310" key="RiderGenerateDialog/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606949090262" />
+    <state x="100" y="100" width="2368" height="1188" key="VCS.FileHistoryDialog" timestamp="1606950649237">
+      <screen x="0" y="0" width="2560" height="1440" />
+    </state>
+    <state x="100" y="100" width="2368" height="1188" key="VCS.FileHistoryDialog/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950649237" />
     <state x="940" y="324" width="672" height="677" key="run.anything.popup" timestamp="1606947043948">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>

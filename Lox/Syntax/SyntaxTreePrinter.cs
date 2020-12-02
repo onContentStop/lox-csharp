@@ -4,6 +4,11 @@ namespace Lox.Syntax
 {
     public class SyntaxTreePrinter : Expression.IVisitor<string>
     {
+        public string Print(Expression expression)
+        {
+            return expression.Accept(this);
+        }
+        
         public string VisitBinaryExpression(Expression.Binary expression)
         {
             return Parenthesize(expression.OperatorToken.Lexeme, expression.Left, expression.Right);

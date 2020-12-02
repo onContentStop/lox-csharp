@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
+using System.Linq;
+using Lox.Syntax;
 
 namespace Lox
 {
@@ -27,6 +30,7 @@ namespace Lox
         {
             var errorReporter = new ConsoleErrorReporter();
             var showTokens = true;
+            var showTree = true;
             while (true)
             {
                 Console.Write("|> ");
@@ -42,9 +46,13 @@ namespace Lox
                         showTokens = !showTokens;
                         Console.WriteLine(showTokens ? "Showing tokens." : "Not showing tokens.");
                         continue;
+                    case "#showTree":
+                        showTree = !showTree;
+                        Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
+                        continue;
                 }
 
-                var tokens = Run(line, errorReporter);
+                var (tokens, expression) = Run(line, errorReporter);
                 if (showTokens)
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -53,6 +61,13 @@ namespace Lox
                         Console.WriteLine($"{token}");
                     }
 
+                    Console.ResetColor();
+                }
+
+                if (showTree && !errorReporter.HadError)
+                {
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
+                    Console.WriteLine(new SyntaxTreePrinter().Print(expression));
                     Console.ResetColor();
                 }
 
@@ -72,12 +87,15 @@ namespace Lox
             }
         }
 
-        private static IEnumerable<Token> Run(string source, IErrorReporter errorReporter)
+        private static (IEnumerable<Token>, Expression) Run(string source, IErrorReporter errorReporter)
         {
             var scanner = new Scanner(source, errorReporter);
             var tokens = scanner.ScanTokens();
+            var tokensList = tokens.ToImmutableList();
+            var parser = new Parser(tokensList, errorReporter);
+            var expression = parser.Parse();
 
-            return tokens;
+            return (tokensList, expression);
         }
     }
 }
