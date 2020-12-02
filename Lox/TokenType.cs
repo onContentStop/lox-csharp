@@ -1,6 +1,6 @@
 namespace Lox
 {
-    internal enum TokenType
+    public enum TokenType
     {
         LeftParenthesisToken,
         RightParenthesisToken,
