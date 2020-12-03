@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.IO;
-using System.Linq;
 using Lox.Syntax;
 
 namespace Lox
@@ -29,8 +28,9 @@ namespace Lox
         private static void RunPrompt()
         {
             var errorReporter = new ConsoleErrorReporter();
-            var showTokens = true;
-            var showTree = true;
+            var interpreter = new Interpreter(errorReporter);
+            var showTokens = false;
+            var showTree = false;
             while (true)
             {
                 Console.Write("|> ");
@@ -52,7 +52,7 @@ namespace Lox
                         continue;
                 }
 
-                var (tokens, expression) = Run(line, errorReporter);
+                var (tokens, expression) = Run(interpreter, line, errorReporter);
                 if (showTokens)
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -79,21 +79,32 @@ namespace Lox
         {
             var errorReporter = new ConsoleErrorReporter();
             var contents = File.ReadAllText(path);
-            Run(contents, errorReporter);
+            var interpreter = new Interpreter(errorReporter);
+            Run(interpreter, contents, errorReporter);
 
             if (errorReporter.HadError)
             {
                 Environment.ExitCode = 65;
             }
+
+            if (errorReporter.HadRuntimeError)
+            {
+                Environment.ExitCode = 70;
+            }
         }
 
-        private static (IEnumerable<Token>, Expression) Run(string source, IErrorReporter errorReporter)
+        private static (IEnumerable<Token>, Expression) Run(Interpreter interpreter, string source,
+            IErrorReporter errorReporter)
         {
             var scanner = new Scanner(source, errorReporter);
             var tokens = scanner.ScanTokens();
             var tokensList = tokens.ToImmutableList();
             var parser = new Parser(tokensList, errorReporter);
             var expression = parser.Parse();
+            if (!errorReporter.HadError)
+            {
+                interpreter.Interpret(expression);
+            }
 
             return (tokensList, expression);
         }

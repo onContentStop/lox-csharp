@@ -19,9 +19,11 @@
       <e p="Lox" t="IncludeRecursive">
         <e p="ConsoleErrorReporter.cs" t="Include" />
         <e p="IErrorReporter.cs" t="Include" />
+        <e p="Interpreter.cs" t="Include" />
         <e p="Lox.cs" t="Include" />
         <e p="Lox.csproj" t="IncludeRecursive" />
         <e p="Parser.cs" t="Include" />
+        <e p="RuntimeError.cs" t="Include" />
         <e p="Scanner.cs" t="Include" />
         <e p="Syntax" t="Include">
           <e p="Expression.cs" t="Include" />
