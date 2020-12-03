@@ -1,4 +1,4 @@
-using System;
+using System.Collections.Generic;
 
 namespace Lox.Syntax
 {
@@ -6,10 +6,29 @@ namespace Lox.Syntax
     {
         public interface IVisitor<out T>
         {
+            T VisitAssignmentExpression(Assignment expression);
             T VisitBinaryExpression(Binary expression);
             T VisitGroupingExpression(Grouping expression);
             T VisitLiteralExpression(Literal expression);
             T VisitUnaryExpression(Unary expression);
+            T VisitVariableExpression(Variable expression);
+        }
+
+        public sealed class Assignment : Expression
+        {
+            public Token Name { get; }
+            public Expression Value { get; }
+
+            public Assignment(Token name, Expression value)
+            {
+                Name = name;
+                Value = value;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitAssignmentExpression(this);
+            }
         }
 
         public sealed class Binary : Expression
@@ -75,6 +94,21 @@ namespace Lox.Syntax
             public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitUnaryExpression(this);
+            }
+        }
+
+        public sealed class Variable : Expression
+        {
+            public Token Name { get; }
+
+            public Variable(Token name)
+            {
+                Name = name;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitVariableExpression(this);
             }
         }
 

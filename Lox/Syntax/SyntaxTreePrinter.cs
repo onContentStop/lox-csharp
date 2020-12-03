@@ -8,7 +8,12 @@ namespace Lox.Syntax
         {
             return expression.Accept(this);
         }
-        
+
+        public string VisitAssignmentExpression(Expression.Assignment expression)
+        {
+            return Parenthesize($"assign {expression.Name}", expression.Value);
+        }
+
         public string VisitBinaryExpression(Expression.Binary expression)
         {
             return Parenthesize(expression.OperatorToken.Lexeme, expression.Left, expression.Right);
@@ -27,6 +32,11 @@ namespace Lox.Syntax
         public string VisitUnaryExpression(Expression.Unary expression)
         {
             return Parenthesize(expression.OperatorToken.Lexeme, expression.Right);
+        }
+
+        public string VisitVariableExpression(Expression.Variable expression)
+        {
+            return $"{expression.Name.Lexeme}";
         }
 
         private string Parenthesize(string name, params Expression[] expressions)

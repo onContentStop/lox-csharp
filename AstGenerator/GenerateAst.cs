@@ -21,10 +21,20 @@ namespace AstGenerator
             var outputDir = args[0];
             DefineAst(outputDir, "Expression", new List<string>
             {
-                "Binary   : Expression left, Token operatorToken, Expression right",
-                "Grouping : Expression expression",
-                "Literal  : object value",
-                "Unary    : Token operatorToken, Expression right",
+                "Assignment : Token name, Expression value",
+                "Binary     : Expression left, Token operatorToken, Expression right",
+                "Grouping   : Expression expression",
+                "Literal    : object value",
+                "Unary      : Token operatorToken, Expression right",
+                "Variable   : Token name",
+            });
+
+            DefineAst(outputDir, "Statement", new List<string>
+            {
+                "ExpressionStatement : Expression expression",
+                "Print               : Expression expression",
+                "VariableDeclaration : Token name, Expression initializer",
+                "Block               : IEnumerable<Statement> statements",
             });
         }
 
@@ -33,7 +43,7 @@ namespace AstGenerator
             var path = $"{outputDir}/Syntax/{baseName}.cs";
             using var writer = new StreamWriter(path);
 
-            writer.WriteLine("using System;");
+            writer.WriteLine("using System.Collections.Generic;");
             writer.WriteLine();
             writer.WriteLine("namespace Lox.Syntax");
             writer.WriteLine("{");
@@ -105,7 +115,7 @@ namespace AstGenerator
             writer.WriteLine("            {");
             writer.WriteLine($"                return visitor.Visit{className}{baseName}(this);");
             writer.WriteLine("            }");
-            
+
             writer.WriteLine("        }");
         }
 

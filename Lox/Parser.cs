@@ -1,12 +1,8 @@
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using Expression = Lox.Syntax.Expression;
+using Lox.Syntax;
 
 namespace Lox
 {
@@ -27,93 +23,187 @@ namespace Lox
             _current = 0;
         }
 
-        public Expression Parse()
+        public IEnumerable<Statement> Parse()
+        {
+            var statements = new List<Statement>();
+            while (!AtEnd)
+            {
+                statements.Add(ParseDeclaration());
+            }
+
+            return statements;
+        }
+
+        private Statement ParseDeclaration()
         {
             try
             {
-                return Expression();
+                if (Match(TokenType.VarKeyword))
+                {
+                    return ParseVariableDeclaration();
+                }
+
+                return ParseStatement();
             }
             catch (ParseError)
             {
+                Synchronize();
                 return null;
             }
         }
 
-        private Expression Expression()
+        private Statement ParseVariableDeclaration()
         {
-            return Equality();
+            var name = Consume(TokenType.IdentifierToken, "Expected variable name.");
+
+            Expression initializer = null;
+            if (Match(TokenType.EqualsToken))
+            {
+                initializer = ParseExpression();
+            }
+
+            Consume(TokenType.SemicolonToken, "Expected ';' after variable declaration.");
+            return new Statement.VariableDeclaration(name, initializer);
         }
 
-        private Expression Equality()
+        private Statement ParseStatement()
         {
-            var expression = Comparison();
+            if (Match(TokenType.PrintKeyword))
+            {
+                return ParsePrintStatement();
+            }
+
+            if (Match(TokenType.LeftBraceToken))
+            {
+                return new Statement.Block(ParseBlockStatement());
+            }
+
+            return ParseExpressionStatement();
+        }
+
+        private IEnumerable<Statement> ParseBlockStatement()
+        {
+            var statements = new List<Statement>();
+
+            while (!Check(TokenType.RightBraceToken) && !AtEnd)
+            {
+                statements.Add(ParseDeclaration());
+            }
+
+            Consume(TokenType.RightBraceToken, "Expected '}' after block.");
+            return statements;
+        }
+
+        private Statement ParsePrintStatement()
+        {
+            var value = ParseExpression();
+            Consume(TokenType.SemicolonToken, "Expected ';' after value.");
+            return new Statement.Print(value);
+        }
+
+        private Statement ParseExpressionStatement()
+        {
+            var expression = ParseExpression();
+            Consume(TokenType.SemicolonToken, "Expected ';' after expression.");
+            return new Statement.ExpressionStatement(expression);
+        }
+
+        private Expression ParseExpression()
+        {
+            return ParseAssignmentExpression();
+        }
+
+        private Expression ParseAssignmentExpression()
+        {
+            var expression = ParseEqualityExpression();
+
+            if (Match(TokenType.EqualsToken))
+            {
+                var equalsToken = Previous;
+                var value = ParseAssignmentExpression();
+
+                if (expression is Expression.Variable v)
+                {
+                    var name = v.Name;
+                    return new Expression.Assignment(name, value);
+                }
+                
+                _errorReporter.Report(equalsToken, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        private Expression ParseEqualityExpression()
+        {
+            var expression = ParseComparisonExpression();
 
             while (Match(TokenType.BangEqualsToken, TokenType.EqualsEqualsToken))
             {
                 var operatorToken = Previous;
-                var right = Comparison();
+                var right = ParseComparisonExpression();
                 expression = new Expression.Binary(expression, operatorToken, right);
             }
 
             return expression;
         }
 
-        private Expression Comparison()
+        private Expression ParseComparisonExpression()
         {
-            var expression = Term();
+            var expression = ParseTermExpression();
 
             while (Match(TokenType.GreaterToken, TokenType.GreaterEqualsToken, TokenType.LessToken,
                 TokenType.LessEqualsToken))
             {
                 var operatorToken = Previous;
-                var right = Term();
+                var right = ParseTermExpression();
                 expression = new Expression.Binary(expression, operatorToken, right);
             }
 
             return expression;
         }
 
-        private Expression Term()
+        private Expression ParseTermExpression()
         {
-            var expression = Factor();
+            var expression = ParseFactorExpression();
 
             while (Match(TokenType.MinusToken, TokenType.PlusToken))
             {
                 var operatorToken = Previous;
-                var right = Factor();
+                var right = ParseFactorExpression();
                 expression = new Expression.Binary(expression, operatorToken, right);
             }
 
             return expression;
         }
 
-        private Expression Factor()
+        private Expression ParseFactorExpression()
         {
-            var expression = Unary();
+            var expression = ParseUnaryExpression();
 
             while (Match(TokenType.SlashToken, TokenType.StarToken))
             {
                 var operatorToken = Previous;
-                var right = Unary();
+                var right = ParseUnaryExpression();
                 expression = new Expression.Binary(expression, operatorToken, right);
             }
 
             return expression;
         }
 
-        private Expression Unary()
+        private Expression ParseUnaryExpression()
         {
             if (Match(TokenType.BangToken, TokenType.MinusToken))
             {
                 var operatorToken = Previous;
-                var right = Unary();
+                var right = ParseUnaryExpression();
                 return new Expression.Unary(operatorToken, right);
             }
 
-            return Primary();
+            return ParsePrimaryExpression();
         }
 
-        private Expression Primary()
+        private Expression ParsePrimaryExpression()
         {
             if (Match(TokenType.FalseKeyword))
             {
@@ -135,9 +225,14 @@ namespace Lox
                 return new Expression.Literal(Previous.Literal);
             }
 
+            if (Match(TokenType.IdentifierToken))
+            {
+                return new Expression.Variable(Previous);
+            }
+
             if (Match(TokenType.LeftParenthesisToken))
             {
-                var expression = Expression();
+                var expression = ParseExpression();
                 Consume(TokenType.RightParenthesisToken, "Expected ')' after expression.");
                 return new Expression.Grouping(expression);
             }

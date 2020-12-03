@@ -13,7 +13,7 @@ namespace Lox
             if (args.Length > 1)
             {
                 Console.WriteLine("Usage: jlox [script]");
-                Environment.ExitCode = 64;
+                System.Environment.ExitCode = 64;
             }
             else if (args.Length == 1)
             {
@@ -30,7 +30,6 @@ namespace Lox
             var errorReporter = new ConsoleErrorReporter();
             var interpreter = new Interpreter(errorReporter);
             var showTokens = false;
-            var showTree = false;
             while (true)
             {
                 Console.Write("|> ");
@@ -46,13 +45,9 @@ namespace Lox
                         showTokens = !showTokens;
                         Console.WriteLine(showTokens ? "Showing tokens." : "Not showing tokens.");
                         continue;
-                    case "#showTree":
-                        showTree = !showTree;
-                        Console.WriteLine(showTree ? "Showing parse trees." : "Not showing parse trees.");
-                        continue;
                 }
 
-                var (tokens, expression) = Run(interpreter, line, errorReporter);
+                var (tokens, _) = Run(interpreter, line, errorReporter);
                 if (showTokens)
                 {
                     Console.ForegroundColor = ConsoleColor.Gray;
@@ -61,13 +56,6 @@ namespace Lox
                         Console.WriteLine($"{token}");
                     }
 
-                    Console.ResetColor();
-                }
-
-                if (showTree && !errorReporter.HadError)
-                {
-                    Console.ForegroundColor = ConsoleColor.DarkBlue;
-                    Console.WriteLine(new SyntaxTreePrinter().Print(expression));
                     Console.ResetColor();
                 }
 
@@ -84,29 +72,28 @@ namespace Lox
 
             if (errorReporter.HadError)
             {
-                Environment.ExitCode = 65;
+                System.Environment.ExitCode = 65;
             }
 
             if (errorReporter.HadRuntimeError)
             {
-                Environment.ExitCode = 70;
+                System.Environment.ExitCode = 70;
             }
         }
 
-        private static (IEnumerable<Token>, Expression) Run(Interpreter interpreter, string source,
+        private static (IEnumerable<Token>, IEnumerable<Statement>) Run(Interpreter interpreter, string source,
             IErrorReporter errorReporter)
         {
             var scanner = new Scanner(source, errorReporter);
-            var tokens = scanner.ScanTokens();
-            var tokensList = tokens.ToImmutableList();
-            var parser = new Parser(tokensList, errorReporter);
-            var expression = parser.Parse();
+            var tokens = scanner.ScanTokens().ToImmutableArray();
+            var parser = new Parser(tokens, errorReporter);
+            var statements = parser.Parse().ToImmutableArray();
             if (!errorReporter.HadError)
             {
-                interpreter.Interpret(expression);
+                interpreter.Interpret(statements);
             }
 
-            return (tokensList, expression);
+            return (tokens, statements);
         }
     }
 }

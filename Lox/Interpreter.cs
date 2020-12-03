@@ -1,28 +1,56 @@
 using System;
-using System.Transactions;
+using System.Collections.Generic;
+using System.Globalization;
 using Lox.Syntax;
 
 namespace Lox
 {
-    internal class Interpreter : Expression.IVisitor<object>
+    internal class Interpreter : Expression.IVisitor<object>, Statement.IVisitor<object>
     {
         private readonly IErrorReporter _errorReporter;
+        private Environment _environment;
 
         public Interpreter(IErrorReporter errorReporter)
         {
             _errorReporter = errorReporter;
+            _environment = new Environment();
         }
 
-        public void Interpret(Expression expression)
+        public void Interpret(IEnumerable<Statement> statements)
         {
             try
             {
-                var value = Evaluate(expression);
-                Console.WriteLine(Stringify(value));
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
             }
             catch (RuntimeError error)
             {
                 _errorReporter.ReportRuntimeError(error);
+            }
+        }
+
+        private void Execute(Statement statement)
+        {
+            statement.Accept(this);
+        }
+
+        private void ExecuteBlock(IEnumerable<Statement> statements, Environment environment)
+        {
+            var previous = _environment;
+            try
+            {
+                _environment = environment;
+
+                foreach (var statement in statements)
+                {
+                    Execute(statement);
+                }
+            }
+            finally
+            {
+                _environment = previous;
             }
         }
 
@@ -97,6 +125,18 @@ namespace Lox
             }
         }
 
+        public object VisitVariableExpression(Expression.Variable expression)
+        {
+            return _environment.Get(expression.Name);
+        }
+
+        public object VisitAssignmentExpression(Expression.Assignment expression)
+        {
+            var value = Evaluate(expression.Value);
+            _environment.Assign(expression.Name, value);
+            return value;
+        }
+
         private static bool IsEqual(object left, object right)
         {
             return left switch
@@ -150,8 +190,8 @@ namespace Lox
                     return "nil";
                 case decimal d:
                 {
-                    var text = value.ToString();
-                    if (text != null && text.EndsWith(".0"))
+                    var text = d.ToString(CultureInfo.CurrentCulture);
+                    if (text.EndsWith(".0"))
                     {
                         text = text.Substring(0, text.Length - 2);
                     }
@@ -161,6 +201,37 @@ namespace Lox
                 default:
                     return value.ToString();
             }
+        }
+
+        public object VisitExpressionStatementStatement(Statement.ExpressionStatement statement)
+        {
+            Evaluate(statement.Expression);
+            return null;
+        }
+
+        public object VisitPrintStatement(Statement.Print statement)
+        {
+            var value = Evaluate(statement.Expression);
+            Console.WriteLine(Stringify(value));
+            return null;
+        }
+
+        public object VisitVariableDeclarationStatement(Statement.VariableDeclaration statement)
+        {
+            object value = null;
+            if (statement.Initializer != null)
+            {
+                value = Evaluate(statement.Initializer);
+            }
+
+            _environment.Define(statement.Name.Lexeme, value);
+            return null;
+        }
+
+        public object VisitBlockStatement(Statement.Block statement)
+        {
+            ExecuteBlock(statement.Statements, new Environment(_environment));
+            return null;
         }
     }
 }
