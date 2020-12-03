@@ -8,6 +8,7 @@ namespace Lox.Syntax
         {
             T VisitAssignmentExpression(Assignment expression);
             T VisitBinaryExpression(Binary expression);
+            T VisitCallExpression(Call expression);
             T VisitGroupingExpression(Grouping expression);
             T VisitLiteralExpression(Literal expression);
             T VisitLogicalExpression(Logical expression);
@@ -48,6 +49,25 @@ namespace Lox.Syntax
             public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitBinaryExpression(this);
+            }
+        }
+
+        public sealed class Call : Expression
+        {
+            public Expression Callee { get; }
+            public Token ParenthesisToken { get; }
+            public IEnumerable<Expression> Arguments { get; }
+
+            public Call(Expression callee, Token parenthesisToken, IEnumerable<Expression> arguments)
+            {
+                Callee = callee;
+                ParenthesisToken = parenthesisToken;
+                Arguments = arguments;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitCallExpression(this);
             }
         }
 

@@ -38,6 +38,11 @@ namespace Lox
         {
             try
             {
+                if (Match(TokenType.FunKeyword))
+                {
+                    return ParseFunctionDeclaration("function");
+                }
+
                 if (Match(TokenType.VarKeyword))
                 {
                     return ParseVariableDeclaration();
@@ -50,6 +55,36 @@ namespace Lox
                 Synchronize();
                 return null;
             }
+        }
+
+        private Statement ParseFunctionDeclaration(string kind)
+        {
+            var name = Consume(TokenType.IdentifierToken, $"Expected {kind} name.");
+            Consume(TokenType.LeftParenthesisToken, $"Expected '(' after {kind} name.");
+            var parameters = new List<Token>();
+            if (!Check(TokenType.RightParenthesisToken))
+            {
+                while (true)
+                {
+                    if (parameters.Count > 255)
+                    {
+                        _errorReporter.Report(Peek, "Can't have more than 255 parameters.");
+                    }
+
+                    parameters.Add(Consume(TokenType.IdentifierToken, "Expected parameter name."));
+
+                    if (!Match(TokenType.CommaToken))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            Consume(TokenType.RightParenthesisToken, $"Expected ')' after {kind} arguments.");
+
+            Consume(TokenType.LeftBraceToken, $"Expected '{{' before {kind} body.");
+            var body = ParseBlockStatement();
+            return new Statement.Function(name, parameters, body);
         }
 
         private Statement ParseVariableDeclaration()
@@ -83,6 +118,11 @@ namespace Lox
                 return ParsePrintStatement();
             }
 
+            if (Match(TokenType.ReturnKeyword))
+            {
+                return ParseReturnStatement();
+            }
+
             if (Match(TokenType.WhileKeyword))
             {
                 return ParseWhileStatement();
@@ -94,6 +134,19 @@ namespace Lox
             }
 
             return ParseExpressionStatement();
+        }
+
+        private Statement ParseReturnStatement()
+        {
+            var keyword = Previous;
+            Expression value = null;
+            if (!Check(TokenType.SemicolonToken))
+            {
+                value = ParseExpression();
+            }
+
+            Consume(TokenType.SemicolonToken, "Expected ';' after return value.");
+            return new Statement.Return(keyword, value);
         }
 
         private Statement ParseForStatement()
@@ -216,7 +269,7 @@ namespace Lox
 
         private Expression ParseAssignmentExpression()
         {
-            var expression = ParseEqualityExpression();
+            var expression = ParseLogicalOrExpression();
 
             if (Match(TokenType.EqualsToken))
             {
@@ -329,7 +382,51 @@ namespace Lox
                 return new Expression.Unary(operatorToken, right);
             }
 
-            return ParsePrimaryExpression();
+            return ParseCallExpression();
+        }
+
+        private Expression ParseCallExpression()
+        {
+            var expression = ParsePrimaryExpression();
+
+            while (true)
+            {
+                if (Match(TokenType.LeftParenthesisToken))
+                {
+                    expression = FinishCall(expression);
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+            return expression;
+        }
+
+        private Expression FinishCall(Expression callee)
+        {
+            var arguments = new List<Expression>();
+            if (!Check(TokenType.RightParenthesisToken))
+            {
+                while (true)
+                {
+                    arguments.Add(ParseExpression());
+                    if (arguments.Count > 255)
+                    {
+                        _errorReporter.Report(Peek, "Can't have more than 255 arguments.");
+                    }
+
+                    if (!Match(TokenType.CommaToken))
+                    {
+                        break;
+                    }
+                }
+            }
+
+            var parenthesis = Consume(TokenType.RightParenthesisToken, "Expected ')' after arguments.");
+
+            return new Expression.Call(callee, parenthesis, arguments);
         }
 
         private Expression ParsePrimaryExpression()

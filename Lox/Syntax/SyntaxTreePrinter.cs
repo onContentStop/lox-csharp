@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Lox.Syntax
@@ -17,6 +19,11 @@ namespace Lox.Syntax
         public string VisitBinaryExpression(Expression.Binary expression)
         {
             return Parenthesize(expression.OperatorToken.Lexeme, expression.Left, expression.Right);
+        }
+
+        public string VisitCallExpression(Expression.Call expression)
+        {
+            return ParenthesizeNameless(new List<Expression> {expression.Callee}.Concat(expression.Arguments));
         }
 
         public string VisitGroupingExpression(Expression.Grouping expression)
@@ -57,6 +64,15 @@ namespace Lox.Syntax
 
             builder.Append(")");
 
+            return builder.ToString();
+        }
+
+        private string ParenthesizeNameless(IEnumerable<Expression> expressions)
+        {
+            var builder = new StringBuilder();
+            builder.Append("(");
+            builder.Append(string.Join(" ", expressions.Select(e => e.Accept(this))));
+            builder.Append(")");
             return builder.ToString();
         }
     }

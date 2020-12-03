@@ -1,19 +1,43 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using Lox.Syntax;
 
 namespace Lox
 {
     internal class Interpreter : Expression.IVisitor<object>, Statement.IVisitor<object>
     {
+        private class ClockFunction : ILoxCallable
+        {
+            public object Call(Interpreter interpreter, IEnumerable<object> arguments)
+            {
+                var now = DateTime.Now;
+                return new decimal(now.Second + now.Millisecond * 1e-3);
+            }
+
+            public int Arity()
+            {
+                return 0;
+            }
+
+            public override string ToString()
+            {
+                return "<native function>";
+            }
+        }
+
         private readonly IErrorReporter _errorReporter;
+        public Environment Globals { get; }
         private Environment _environment;
 
         public Interpreter(IErrorReporter errorReporter)
         {
             _errorReporter = errorReporter;
-            _environment = new Environment();
+            Globals = new Environment();
+            _environment = Globals;
+
+            Globals.Define("clock", new ClockFunction());
         }
 
         public void Interpret(IEnumerable<Statement> statements)
@@ -36,7 +60,7 @@ namespace Lox
             statement.Accept(this);
         }
 
-        private void ExecuteBlock(IEnumerable<Statement> statements, Environment environment)
+        public void ExecuteBlock(IEnumerable<Statement> statements, Environment environment)
         {
             var previous = _environment;
             try
@@ -94,9 +118,32 @@ namespace Lox
                     return !IsEqual(left, right);
                 case TokenType.EqualsEqualsToken:
                     return IsEqual(left, right);
+                default:
+                    throw new Exception("Unknown binary expression was reached");
             }
+        }
 
-            throw new Exception("Unknown binary expression was reached");
+        public object VisitCallExpression(Expression.Call expression)
+        {
+            var callee = Evaluate(expression.Callee);
+
+            var arguments = expression.Arguments.Select(Evaluate).ToList();
+
+            if (callee is ILoxCallable function)
+            {
+                if (arguments.Count != function.Arity())
+                {
+                    throw new RuntimeError(expression.ParenthesisToken,
+                        $"Expected {function.Arity()} arguments, but got {arguments.Count}.");
+                }
+
+                return function.Call(this, arguments);
+            }
+            else
+            {
+                throw new RuntimeError(expression.ParenthesisToken,
+                    "Cannot call this expression; it is not a function or class.");
+            }
         }
 
         public object VisitGroupingExpression(Expression.Grouping expression)
@@ -231,6 +278,13 @@ namespace Lox
             return null;
         }
 
+        public object VisitFunctionStatement(Statement.Function statement)
+        {
+            var function = new LoxFunction(statement, _environment);
+            _environment.Define(statement.Name.Lexeme, function);
+            return null;
+        }
+
         public object VisitIfStatement(Statement.If statement)
         {
             if (IsTruthy(statement.Condition))
@@ -251,6 +305,17 @@ namespace Lox
             var value = Evaluate(statement.Expression);
             Console.WriteLine(Stringify(value));
             return null;
+        }
+
+        public object VisitReturnStatement(Statement.Return statement)
+        {
+            object value = null;
+            if (statement.Value != null)
+            {
+                value = Evaluate(statement.Value);
+            }
+
+            throw new Return(value);
         }
 
         public object VisitVariableDeclarationStatement(Statement.VariableDeclaration statement)
