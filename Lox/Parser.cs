@@ -68,9 +68,24 @@ namespace Lox
 
         private Statement ParseStatement()
         {
+            if (Match(TokenType.ForKeyword))
+            {
+                return ParseForStatement();
+            }
+
+            if (Match(TokenType.IfKeyword))
+            {
+                return ParseIfStatement();
+            }
+
             if (Match(TokenType.PrintKeyword))
             {
                 return ParsePrintStatement();
+            }
+
+            if (Match(TokenType.WhileKeyword))
+            {
+                return ParseWhileStatement();
             }
 
             if (Match(TokenType.LeftBraceToken))
@@ -79,6 +94,92 @@ namespace Lox
             }
 
             return ParseExpressionStatement();
+        }
+
+        private Statement ParseForStatement()
+        {
+            Consume(TokenType.LeftParenthesisToken, "Expected '(' after 'for'.");
+
+            Statement initializer;
+            if (Match(TokenType.SemicolonToken))
+            {
+                initializer = null;
+            }
+            else if (Match(TokenType.VarKeyword))
+            {
+                initializer = ParseVariableDeclaration();
+            }
+            else
+            {
+                initializer = ParseExpressionStatement();
+            }
+
+            Expression condition = null;
+            if (!Check(TokenType.SemicolonToken))
+            {
+                condition = ParseExpression();
+            }
+
+            Consume(TokenType.SemicolonToken, "Expected ';' after for loop condition.");
+
+            Expression increment = null;
+            if (!Check(TokenType.RightParenthesisToken))
+            {
+                increment = ParseExpression();
+            }
+
+            Consume(TokenType.RightParenthesisToken, "Expected ')' after for clauses.");
+
+            var body = ParseStatement();
+
+            if (increment != null)
+            {
+                body = new Statement.Block(new List<Statement>
+                {
+                    body,
+                    new Statement.ExpressionStatement(increment),
+                });
+            }
+
+            condition ??= new Expression.Literal(true);
+            body = new Statement.While(condition, body);
+
+            if (initializer != null)
+            {
+                body = new Statement.Block(new List<Statement>
+                {
+                    initializer,
+                    body,
+                });
+            }
+
+            return body;
+        }
+
+        private Statement ParseWhileStatement()
+        {
+            Consume(TokenType.LeftParenthesisToken, "Expected '(' after 'while'.");
+            var condition = ParseExpression();
+            Consume(TokenType.RightParenthesisToken, "Expected ')' after while condition.");
+            var body = ParseStatement();
+
+            return new Statement.While(condition, body);
+        }
+
+        private Statement ParseIfStatement()
+        {
+            Consume(TokenType.LeftParenthesisToken, "Expected '(' after 'if'.");
+            var condition = ParseExpression();
+            Consume(TokenType.RightParenthesisToken, "Expected ')' after if condition.");
+
+            var thenBranch = ParseStatement();
+            Statement elseBranch = null;
+            if (Match(TokenType.ElseKeyword))
+            {
+                elseBranch = ParseStatement();
+            }
+
+            return new Statement.If(condition, thenBranch, elseBranch);
         }
 
         private IEnumerable<Statement> ParseBlockStatement()
@@ -127,8 +228,36 @@ namespace Lox
                     var name = v.Name;
                     return new Expression.Assignment(name, value);
                 }
-                
+
                 _errorReporter.Report(equalsToken, "Invalid assignment target.");
+            }
+
+            return expression;
+        }
+
+        private Expression ParseLogicalOrExpression()
+        {
+            var expression = ParseLogicalAndExpression();
+
+            while (Match(TokenType.OrKeyword))
+            {
+                var operatorToken = Previous;
+                var right = ParseLogicalAndExpression();
+                expression = new Expression.Logical(expression, operatorToken, right);
+            }
+
+            return expression;
+        }
+
+        private Expression ParseLogicalAndExpression()
+        {
+            var expression = ParseEqualityExpression();
+
+            while (Match(TokenType.AndKeyword))
+            {
+                var operatorToken = Previous;
+                var right = ParseEqualityExpression();
+                expression = new Expression.Logical(expression, operatorToken, right);
             }
 
             return expression;

@@ -10,6 +10,7 @@ namespace Lox.Syntax
             T VisitBinaryExpression(Binary expression);
             T VisitGroupingExpression(Grouping expression);
             T VisitLiteralExpression(Literal expression);
+            T VisitLogicalExpression(Logical expression);
             T VisitUnaryExpression(Unary expression);
             T VisitVariableExpression(Variable expression);
         }
@@ -77,6 +78,25 @@ namespace Lox.Syntax
             public override T Accept<T>(IVisitor<T> visitor)
             {
                 return visitor.VisitLiteralExpression(this);
+            }
+        }
+
+        public sealed class Logical : Expression
+        {
+            public Expression Left { get; }
+            public Token OperatorToken { get; }
+            public Expression Right { get; }
+
+            public Logical(Expression left, Token operatorToken, Expression right)
+            {
+                Left = left;
+                OperatorToken = operatorToken;
+                Right = right;
+            }
+
+            public override T Accept<T>(IVisitor<T> visitor)
+            {
+                return visitor.VisitLogicalExpression(this);
             }
         }
 

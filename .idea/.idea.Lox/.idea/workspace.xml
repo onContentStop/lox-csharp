@@ -9,16 +9,13 @@
     <select />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="be50fef8-56e6-460c-a4ba-fb105f36eb83" name="Default Changelist" comment="Interpreting code!">
-      <change afterPath="$PROJECT_DIR$/Lox/Environment.cs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Lox/Syntax/Statement.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/contentModel.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/contentModel.xml" afterDir="false" />
+    <list default="true" id="be50fef8-56e6-460c-a4ba-fb105f36eb83" name="Default Changelist" comment="Statements! Variables">
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lox/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/AstGenerator/GenerateAst.cs" beforeDir="false" afterPath="$PROJECT_DIR$/AstGenerator/GenerateAst.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lox/Interpreter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Interpreter.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Lox/Lox.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Lox.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lox/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Parser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lox/Syntax/Expression.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Syntax/Expression.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Lox/Syntax/Statement.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Syntax/Statement.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" beforeDir="false" afterPath="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -46,12 +43,12 @@
         <option value="$PROJECT_DIR$/Lox/IErrorReporter.cs" />
         <option value="$PROJECT_DIR$/Lox/RuntimeError.cs" />
         <option value="$PROJECT_DIR$/Lox/ConsoleErrorReporter.cs" />
+        <option value="$PROJECT_DIR$/Lox/Environment.cs" />
         <option value="$PROJECT_DIR$/Lox/Lox.cs" />
         <option value="$PROJECT_DIR$/Lox/Syntax/SyntaxTreePrinter.cs" />
-        <option value="$PROJECT_DIR$/Lox/Environment.cs" />
         <option value="$PROJECT_DIR$/AstGenerator/GenerateAst.cs" />
-        <option value="$PROJECT_DIR$/Lox/Parser.cs" />
         <option value="$PROJECT_DIR$/Lox/Interpreter.cs" />
+        <option value="$PROJECT_DIR$/Lox/Parser.cs" />
       </list>
     </option>
   </component>
@@ -130,7 +127,7 @@
       <option name="presentableId" value="Default" />
       <updated>1606928922747</updated>
       <workItem from="1606928930046" duration="13877000" />
-      <workItem from="1606955015380" duration="1974000" />
+      <workItem from="1606955015380" duration="3299000" />
     </task>
     <task id="LOCAL-00001" summary="Chapter 4">
       <created>1606946039099</created>
@@ -167,7 +164,14 @@
       <option name="project" value="LOCAL" />
       <updated>1606954134275</updated>
     </task>
-    <option name="localTasksCounter" value="6" />
+    <task id="LOCAL-00006" summary="Statements! Variables">
+      <created>1606957256347</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1606957256347</updated>
+    </task>
+    <option name="localTasksCounter" value="7" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -195,29 +199,30 @@
     <MESSAGE value="Add another IDEA file" />
     <MESSAGE value="Parsing expressions" />
     <MESSAGE value="Interpreting code!" />
-    <option name="LAST_COMMIT_MESSAGE" value="Interpreting code!" />
+    <MESSAGE value="Statements! Variables" />
+    <option name="LAST_COMMIT_MESSAGE" value="Statements! Variables" />
   </component>
   <component name="WindowStateProjectService">
     <state x="739" y="353" key="#com.intellij.execution.impl.EditConfigurationsDialog" timestamp="1606946955908">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="739" y="353" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606946955908" />
-    <state width="2514" height="379" key="GridCell.Tab.0.bottom" timestamp="1606956890633">
+    <state width="2514" height="379" key="GridCell.Tab.0.bottom" timestamp="1606957964503">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.bottom/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606956890633" />
-    <state width="2514" height="379" key="GridCell.Tab.0.center" timestamp="1606956890633">
+    <state width="2514" height="379" key="GridCell.Tab.0.bottom/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606957964503" />
+    <state width="2514" height="379" key="GridCell.Tab.0.center" timestamp="1606957964503">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.center/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606956890633" />
-    <state width="2514" height="379" key="GridCell.Tab.0.left" timestamp="1606956890633">
+    <state width="2514" height="379" key="GridCell.Tab.0.center/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606957964503" />
+    <state width="2514" height="379" key="GridCell.Tab.0.left" timestamp="1606957964503">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.left/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606956890633" />
-    <state width="2514" height="379" key="GridCell.Tab.0.right" timestamp="1606956890633">
+    <state width="2514" height="379" key="GridCell.Tab.0.left/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606957964503" />
+    <state width="2514" height="379" key="GridCell.Tab.0.right" timestamp="1606957964503">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
-    <state width="2514" height="379" key="GridCell.Tab.0.right/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606956890633" />
+    <state width="2514" height="379" key="GridCell.Tab.0.right/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606957964503" />
     <state x="876" y="430" key="Rider.ProjectTemplateDialog.Size" timestamp="1606946298956">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
@@ -230,6 +235,10 @@
       <screen x="0" y="0" width="2560" height="1440" />
     </state>
     <state x="100" y="100" width="2368" height="1188" key="VCS.FileHistoryDialog/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606950649237" />
+    <state x="876" y="427" key="Vcs.Push.Dialog.v2" timestamp="1606957323426">
+      <screen x="0" y="0" width="2560" height="1440" />
+    </state>
+    <state x="876" y="427" key="Vcs.Push.Dialog.v2/0.0.2560.1440/2560.613.1920.1080@0.0.2560.1440" timestamp="1606957323426" />
     <state x="940" y="324" width="672" height="677" key="run.anything.popup" timestamp="1606947043948">
       <screen x="0" y="0" width="2560" height="1440" />
     </state>

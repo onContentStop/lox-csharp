@@ -25,6 +25,7 @@ namespace AstGenerator
                 "Binary     : Expression left, Token operatorToken, Expression right",
                 "Grouping   : Expression expression",
                 "Literal    : object value",
+                "Logical    : Expression left, Token operatorToken, Expression right",
                 "Unary      : Token operatorToken, Expression right",
                 "Variable   : Token name",
             });
@@ -32,8 +33,10 @@ namespace AstGenerator
             DefineAst(outputDir, "Statement", new List<string>
             {
                 "ExpressionStatement : Expression expression",
+                "If                  : Expression condition, Statement thenBranch, Statement elseBranch",
                 "Print               : Expression expression",
                 "VariableDeclaration : Token name, Expression initializer",
+                "While               : Expression condition, Statement body",
                 "Block               : IEnumerable<Statement> statements",
             });
         }

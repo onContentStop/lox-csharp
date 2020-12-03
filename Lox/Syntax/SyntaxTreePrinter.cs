@@ -29,6 +29,11 @@ namespace Lox.Syntax
             return expression.Value == null ? "nil" : expression.Value.ToString();
         }
 
+        public string VisitLogicalExpression(Expression.Logical expression)
+        {
+            return Parenthesize(expression.OperatorToken.Lexeme, expression.Left, expression.Right);
+        }
+
         public string VisitUnaryExpression(Expression.Unary expression)
         {
             return Parenthesize(expression.OperatorToken.Lexeme, expression.Right);

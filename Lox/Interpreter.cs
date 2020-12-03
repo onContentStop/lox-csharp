@@ -109,6 +109,28 @@ namespace Lox
             return expression.Value;
         }
 
+        public object VisitLogicalExpression(Expression.Logical expression)
+        {
+            var left = Evaluate(expression.Left);
+
+            if (expression.OperatorToken.Type == TokenType.OrKeyword)
+            {
+                if (IsTruthy(left))
+                {
+                    return left;
+                }
+            }
+            else
+            {
+                if (!IsTruthy(left))
+                {
+                    return left;
+                }
+            }
+
+            return Evaluate(expression.Right);
+        }
+
         public object VisitUnaryExpression(Expression.Unary expression)
         {
             var right = Evaluate(expression.Right);
@@ -209,6 +231,21 @@ namespace Lox
             return null;
         }
 
+        public object VisitIfStatement(Statement.If statement)
+        {
+            if (IsTruthy(statement.Condition))
+            {
+                Execute(statement.ThenBranch);
+            }
+            else if (statement.ElseBranch != null)
+            {
+                Execute(statement.ElseBranch);
+            }
+            // else do nothing
+
+            return null;
+        }
+
         public object VisitPrintStatement(Statement.Print statement)
         {
             var value = Evaluate(statement.Expression);
@@ -225,6 +262,16 @@ namespace Lox
             }
 
             _environment.Define(statement.Name.Lexeme, value);
+            return null;
+        }
+
+        public object VisitWhileStatement(Statement.While statement)
+        {
+            while (IsTruthy(Evaluate(statement.Condition)))
+            {
+                Execute(statement.Body);
+            }
+
             return null;
         }
 
